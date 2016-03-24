@@ -25,33 +25,62 @@ module.exports = function(resource) {
 	switch(scheme) {
 	  case 'url:':
 	    // handle url, for remote files
-		var url = 'http://www.whatever.com/my.csv'; // TO DO: replace by proper url...
-        request.get(url, function (error, response, body) {
-          if (!error && response.statusCode == 200) {
-            var csv = body;
-            // Continue with your processing here.
-			switch(configuration) {
-			  case 'applications':
+		switch(configuration) {
+		  case 'applications':
+			var url = path.resolve(URI.heirpart().value, configuration+'.js'); // e.g. 'http://www.whatever.com/configs/applications.js'
+			request.get(url, function (error, response, body) {
+			  if (!error && response.statusCode == 200) {
 				configurations.applications = body(resource);
 				console.log('Configurations.applications: ', configurations.applications);
-				break;
-			  case 'common':
-				configurations.common = body(resource);
-				console.log('Configurations.common: ', configurations.common);
-				break;
-			  case 'databases':
-				configurations.databases = body(resource);
-				console.log('Configurations.databases: ', configurations.databases);
-				break;
-			  case 'servers':
-				configurations.servers = body(resource);
-				console.log('Configurations.servers: ', configurations.servers);
-				break;
-			  default:
-				// do nothing
-			}
-          }
-        });
+			  }
+			  else {
+				console.log('Configurations.applications: File could not be found at url: ', url);
+				console.log('Error: ', error);
+			  }
+		    });	
+			break;
+		  case 'common':
+            var url = path.resolve(URI.heirpart().value, configuration+'.js'); // e.g. 'http://www.whatever.com/configs/common.js'
+			request.get(url, function (error, response, body) {
+			  if (!error && response.statusCode == 200) {		  
+			    configurations.common = body(resource);
+			    console.log('Configurations.common: ', configurations.common);
+			  }
+			  else {
+				console.log('Configurations.common: File could not be found at url: ', url);
+				console.log('Error: ', error);
+			  }			  
+		    });	
+			break;
+		  case 'databases':
+            var url = path.resolve(URI.heirpart().value, configuration+'.js'); // e.g. 'http://www.whatever.com/configs/databases.js'
+			request.get(url, function (error, response, body) {
+			  if (!error && response.statusCode == 200) {		  
+			    configurations.databases = body(resource);
+			    console.log('Configurations.databases: ', configurations.databases);
+			  }
+			  else {
+				console.log('Configurations.databases: File could not be found at url: ', url);
+				console.log('Error: ', error);
+			  }			  
+		    });			
+			break;
+		  case 'servers':
+            var url = path.resolve(URI.heirpart().value, configuration+'.js'); // e.g. 'http://www.whatever.com/configs/servers.js'
+			request.get(url, function (error, response, body) {
+			  if (!error && response.statusCode == 200) {		  
+			    configurations.servers = body(resource);
+			    console.log('Configurations.servers: ', configurations.servers);
+			  }
+			  else {
+				console.log('Configurations.servers: File could not be found at url: ', url);
+				console.log('Error: ', error);
+			  }			  
+		    });				
+			break;
+		  default:
+			// do nothing
+        }// eof switch(configuration)
 		break;
       case 'urn:':
         // handle urn, for local files
@@ -90,7 +119,7 @@ module.exports = function(resource) {
 		break;
 	  default:
 		// do nothing
-	}
+	}// eof switch(scheme)
   };
   lookup(_Configurations, 'applications', resource);
   lookup(_Configurations, 'common', resource);
