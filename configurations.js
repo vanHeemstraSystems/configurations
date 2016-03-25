@@ -12,14 +12,17 @@ module.exports = function(resource) {
   var fs = require(path.join(paths.libraries, '/fs.js'));
   var uri = require(path.join(paths.libraries, '/uri.js'));
   var request = require(path.join(paths.libraries, '/request.js'));
+  var buf = new Buffer(1024);
   var _Configurations = {};
   // START - TEMPORARY ONLY !!!
+  if(resource == null){
+	console.log('Configurations - no resource provided');
+	resource = {};
+  }
   if(!resource instanceof Array){
 	console.log('Configurations - resource provided is not an instance of Array');
 	resource = {};
   }
-  // END - TEMPORARY ONLY !!!
-  // START - TEMPORARY ONLY !!!
   if(resource.URI == null){
 	console.log('Configurations - no resource.URI provided');
 	//temporary fix:
@@ -41,6 +44,7 @@ module.exports = function(resource) {
 	console.log('Configurations - namespaceSpecificString: ', namespaceSpecificString);
 	switch(scheme) {
 	  case 'url:':
+	    console.log('Configurations - scheme: ', scheme);
 	    // handle url, for remote files
 		switch(configuration) {
 		  case 'applications':
@@ -101,56 +105,47 @@ module.exports = function(resource) {
 		break;
       case 'urn:':
         // handle urn, for local files
+		console.log('Configurations - scheme: ', scheme);
 		var file = path.resolve(__dirname, namespaceSpecificString, configuration+'.js');
-		console.log('Configurations - File: ', file);
-		
-		//---- START TEST AREA
-		
-		// var dirname = __dirname;
-		// console.log('TEST AREA __dirname: ', dirname);
-		
-		// fs.openSync(file, 'rs', function(err, fd) {
-		  // if (err && err.code=='ENOENT') { 
-			// /* file doesn't exist */ 
-			// console.log('TESTAREA File does not exist: ', __dirname+'/6e8bc430-9c3a-11d9-9669-0800200c9a66/applications.js');
-		  // }
-          // else {
-		    // console.log('TESTAREA File does exist: ', __dirname+'/6e8bc430-9c3a-11d9-9669-0800200c9a66/applications.js');
-		  // }
-		// });
-		
-		//---- END TEST AREA
-		
-		fs.openSync(file,'rs',function(err,fd){
-		  console.log('fs.open called');
-		  if (err && err.code=='ENOENT') { 
-			/* file doesn't exist */ 
-			console.log('File does not exist: ', file);
-		  }
-		  else {
-			console.log('File does exist: ', file);
-			switch(configuration) {
-			  case 'applications':
-				configurations.applications = require(file)(resource);
-				console.log('Configurations.applications: ', configurations.applications);
-				break;
-			  case 'common':
-				configurations.common = require(file)(resource);
-				console.log('Configurations.common: ', configurations.common);
-				break;
-			  case 'databases':
-				configurations.databases = require(file)(resource);
-				console.log('Configurations.databases: ', configurations.databases);
-				break;
-			  case 'servers':
-				configurations.servers = require(file)(resource);
-				console.log('Configurations.servers: ', configurations.servers);
-				break;
-			  default:
-				// do nothing
-			}
-		  }
-		});
+		console.log('Configurations - open an existing file: ', file);
+		fs.open(file, 'r+', function(err, fd) {
+		   if (err) {
+			   return console.error(err);
+		   }
+		   console.log("File opened successfully!");
+		   console.log("Going to read the file");
+		   fs.read(fd, buf, 0, buf.length, 0, function(err, bytes){
+			  if (err){
+				 console.log(err);
+			  }
+			  console.log(bytes + " bytes read");
+			  // Print only read bytes to avoid junk.
+			  if(bytes > 0){
+				//console.log(buf.slice(0, bytes).toString());
+				console.log('File does exist: ', file);
+				switch(configuration) {
+				  case 'applications':
+					configurations.applications = require(file)(resource); //WAS buf.slice(0, bytes).toString(); 
+					console.log('Configurations.applications: ', configurations.applications);
+					break;
+				  case 'common':
+					configurations.common = require(file)(resource); //WAS buf.slice(0, bytes).toString();
+					console.log('Configurations.common: ', configurations.common);
+					break;
+				  case 'databases':
+					configurations.databases = require(file)(resource); //WAS buf.slice(0, bytes).toString();
+					console.log('Configurations.databases: ', configurations.databases);
+					break;
+				  case 'servers':
+					configurations.servers = require(file)(resource); //WAS buf.slice(0, bytes).toString(); 
+					console.log('Configurations.servers: ', configurations.servers);
+					break;
+				  default:
+					// do nothing
+				}
+			  }
+		   });
+		}); 
 		break;
 	  default:
 		// do nothing
@@ -160,7 +155,6 @@ module.exports = function(resource) {
   lookup(_Configurations, 'common', resource);
   lookup(_Configurations, 'databases', resource);
   lookup(_Configurations, 'servers', resource);
-
   console.log('Returning Configurations');
   return _Configurations;
 }
