@@ -13,7 +13,7 @@ function Configurations() { }
  * Create a new ConfigurationsConfiguration object.
  * @return {ConfigurationsConfiguration}
  */
-Configurations.prototype.proxy = function() {
+Configurations.prototype.configuration = function() {
   return new ConfigurationsConfiguration();
 }
 
