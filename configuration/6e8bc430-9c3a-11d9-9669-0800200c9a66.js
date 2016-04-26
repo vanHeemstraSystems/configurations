@@ -1,7 +1,9 @@
+/*
+ * 6e8bc430-9c3a-11d9-9669-0800200c9a66.js
+ */
+
 //import 6e8bc430-9c3a-11d9-9669-0800200c9a66 from '6e8bc430-9c3a-11d9-9669-0800200c9a66';
 //
 //export default 6e8bc430-9c3a-11d9-9669-0800200c9a66;
 
-//module.6e8bc430-9c3a-11d9-9669-0800200c9a66 = require(__dirname+'/6e8bc430-9c3a-11d9-9669-0800200c9a66/index.js');
-
-module.exports =  function() { return(require('../../6e8bc430-9c3a-11d9-9669-0800200c9a66/index.js')) }; // Exception, 6e8bc430-9c3a-11d9-9669-0800200c9a66 module needs to be wrapped in a function
+module.exports = require('../../6e8bc430-9c3a-11d9-9669-0800200c9a66/index.js');

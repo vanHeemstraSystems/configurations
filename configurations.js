@@ -18,4 +18,4 @@ Configurations.prototype.configuration = function() {
 }
 
 //ORIGINAL module.exports = new Configurations();
-module.exports = function() { return new Configurations(); }
+module.exports = Configurations; // WAS function() { return new Configurations(); }
